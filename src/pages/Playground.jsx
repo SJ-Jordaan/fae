@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Container } from '@mui/material';
 import Xarrow, { Xwrapper } from 'react-xarrows';
 
-import { Node, ContextMenu } from '../components';
+import { Node, ContextMenu, TrackingBox } from '../components';
 
 const playgroundStyles = {
   height: '100%',
@@ -91,11 +91,15 @@ export const Playground = (props) => {
   };
 
   const startAddingTransition = (node) => {
-    setNewTransition({
+    const tempTransition = {
       start: node.label,
-      end: null,
+      end: 'mouseTracker',
       value: 0,
-    });
+    };
+
+    setNewTransition(tempTransition);
+
+    setTransitions((prevState) => [...prevState, tempTransition]);
   };
 
   const Grid = () => {
@@ -158,6 +162,7 @@ export const Playground = (props) => {
     <ContextMenu contextMenuItems={contextMenuItems}>
       <Container sx={playgroundStyles}>
         <Xwrapper>
+          <TrackingBox />
           <Grid />
         </Xwrapper>
       </Container>
