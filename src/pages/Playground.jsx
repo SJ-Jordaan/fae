@@ -87,7 +87,15 @@ export const Playground = (props) => {
       return;
     }
 
-    setNewTransition((prevState) => ({ ...prevState, end: node.label }));
+    const originalTransitions = transitions.filter(
+      (t) => t.end !== 'mouseTracker',
+    );
+
+    const updatedTransition = transitions[transitions.length - 1];
+    updatedTransition.end = node.label;
+
+    setNewTransition(null);
+    setTransitions([...originalTransitions, updatedTransition]);
   };
 
   const startAddingTransition = (node) => {
