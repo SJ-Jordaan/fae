@@ -4,6 +4,8 @@ import { Container } from '@mui/material';
 import Xarrow, { Xwrapper } from 'react-xarrows';
 
 import { Node, ContextMenu, TrackingBox } from '../components';
+import { StorageProvider } from '../providers';
+import { CACHE_KEYS } from '../constants';
 
 const playgroundStyles = {
   height: '100%',
@@ -19,8 +21,12 @@ const arrowStyles = {
 };
 
 export const Playground = (props) => {
-  const [nodes, setNodes] = useState([]);
-  const [transitions, setTransitions] = useState([]);
+  const [nodes, setNodes] = useState(
+    StorageProvider.getItem(CACHE_KEYS.NODES) || [],
+  );
+  const [transitions, setTransitions] = useState(
+    StorageProvider.getItem(CACHE_KEYS.TRANSITIONS) || [],
+  );
   const [newTransition, setNewTransition] = useState(null);
 
   const addFirstNode = (e) => {
@@ -41,9 +47,6 @@ export const Playground = (props) => {
   };
 
   const addNode = (e) => {
-    // const nodeX = e.clientX - e.target.offsetLeft;
-    // const nodeY = e.clientY - e.target.offsetTop;
-
     if (nodes.length === 0) {
       addFirstNode(e);
       return;
@@ -159,10 +162,28 @@ export const Playground = (props) => {
     return [...nodeGrid, ...transitionGrid];
   };
 
+  const saveProgress = () => {
+    StorageProvider.setItem(CACHE_KEYS.NODES, nodes, true);
+    StorageProvider.setItem(CACHE_KEYS.TRANSITIONS, transitions, true);
+  };
+
+  const clearCanvas = () => {
+    setTransitions([]);
+    setNodes([]);
+  };
+
   const contextMenuItems = [
     {
       text: 'Add State',
       handleClick: (e) => addNode(e),
+    },
+    {
+      text: 'Save Progress',
+      handleClick: saveProgress,
+    },
+    {
+      text: 'Clear Canvas',
+      handleClick: clearCanvas,
     },
   ];
 

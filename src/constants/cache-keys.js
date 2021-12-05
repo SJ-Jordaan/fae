@@ -1,0 +1,5 @@
+export const CACHE_KEYS = {
+  DIAGRAM: 'DIAGRAM',
+  NODES: 'NODES',
+  TRANSITIONS: 'TRANSITIONS',
+};
