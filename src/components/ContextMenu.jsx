@@ -34,7 +34,7 @@ export const ContextMenu = (props) => {
         {props.contextMenuItems?.map((item, index) => (
           <MenuItem
             key={`menuItem-${index}`}
-            onClick={(e) => {
+            onMouseDown={(e) => {
               item.handleClick(e);
               handleClose();
             }}
