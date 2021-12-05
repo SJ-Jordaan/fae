@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Container } from '@mui/material';
 import Xarrow, { Xwrapper } from 'react-xarrows';
 
-import { Node, ContextMenu, TrackingBox } from '../components';
+import { Node, ContextMenu, TrackingBox, TransitionModal } from '../components';
 import { StorageProvider } from '../providers';
 import { CACHE_KEYS } from '../constants';
 
@@ -28,6 +28,7 @@ export const Playground = (props) => {
     StorageProvider.getItem(CACHE_KEYS.TRANSITIONS) || [],
   );
   const [newTransition, setNewTransition] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const addFirstNode = (e) => {
     const newNode = {
@@ -85,6 +86,18 @@ export const Playground = (props) => {
     setTransitions(newTransitions);
   };
 
+  const deleteTransition = (transition) => {
+    const originalTransitions = transitions.filter((t) => t !== transition);
+
+    setTransitions(originalTransitions);
+  };
+
+  const updateTransition = (oldTransition, newTransition) => {
+    const originalTransitions = transitions.filter((t) => t !== oldTransition);
+
+    setTransitions([...originalTransitions, newTransition]);
+  };
+
   const handleNodeClick = (node) => {
     if (!newTransition) {
       return;
@@ -98,6 +111,7 @@ export const Playground = (props) => {
     updatedTransition.end = node.label;
 
     setNewTransition(null);
+    setShowModal(true);
     setTransitions([...originalTransitions, updatedTransition]);
   };
 
@@ -193,6 +207,20 @@ export const Playground = (props) => {
         <Xwrapper>
           {newTransition && <TrackingBox />}
           <Grid />
+          <TransitionModal
+            showModal={showModal}
+            transition={transitions[transitions.length - 1]}
+            onSubmit={(oldT, newT) => {
+              updateTransition(oldT, newT);
+              setShowModal(false);
+              setNewTransition(null);
+            }}
+            onClose={(t) => {
+              setShowModal(false);
+              deleteTransition(t);
+              setNewTransition(null);
+            }}
+          />
         </Xwrapper>
       </Container>
     </ContextMenu>

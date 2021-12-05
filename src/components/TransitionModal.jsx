@@ -1,0 +1,56 @@
+import React, { useState } from 'react';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { Backdrop, Typography } from '@mui/material';
+
+export const TransitionModal = (props) => {
+  const [input, setInput] = useState('');
+
+  const handleSubmit = () => {
+    props.onSubmit?.(props.transition, {
+      ...props.transition,
+      value: input,
+      labels: <Typography bgcolor={'white'}>{input}</Typography>,
+    });
+    setInput('');
+  };
+
+  const handleClose = () => {
+    props.onClose?.(props.transition);
+    setInput('');
+  };
+
+  return (
+    <Backdrop open={props.showModal}>
+      <Dialog open={props.showModal} onClose={handleClose}>
+        <DialogTitle>Transition Value</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Enter the value for the transition from {props.transition?.start} to{' '}
+            {props.transition?.end}.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin='dense'
+            id='transition'
+            label='Transition value'
+            type='text'
+            value={input}
+            onInput={(e) => setInput(e.target.value)}
+            fullWidth
+            variant='standard'
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleSubmit}>Submit</Button>
+        </DialogActions>
+      </Dialog>
+    </Backdrop>
+  );
+};
