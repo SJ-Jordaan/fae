@@ -25,9 +25,20 @@ export const Playground = (props) => {
     setNodes((prevState) => [...prevState, newNode]);
   };
 
+  const updateNode = (index, node) => {
+    const newNodes = [...nodes];
+    newNodes[index] = node;
+    setNodes(newNodes);
+  };
+
   const NodeGrid = () => {
     return nodes.map((node, index) => (
-      <Node key={`${node.label}-${index}`} label={node.label} />
+      <Node
+        key={`${node.label}-${index}`}
+        updateNode={updateNode}
+        index={index}
+        node={node}
+      />
     ));
   };
 

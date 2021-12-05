@@ -16,6 +16,7 @@ const boxStyles = {
   width: '3em',
   boxSizing: 'border-box',
   height: '3em',
+  backgroundColor: 'white',
 };
 
 const contextMenuItems = [
@@ -36,11 +37,24 @@ const contextMenuItems = [
 export const Node = (props) => {
   const nodeRef = useRef(null);
 
+  const handleStop = (e, data) => {
+    props.updateNode(props.index, {
+      ...props.node,
+      position: { x: data.x, y: data.y },
+    });
+  };
+
   return (
-    <Draggable nodeRef={nodeRef}>
+    <Draggable
+      nodeRef={nodeRef}
+      // onDrag={handleDrag}
+      onStop={handleStop}
+      bounds={'parent'}
+      position={props.node.position}
+    >
       <Box ref={nodeRef} sx={boxStyles}>
         <ContextMenu contextMenuItems={contextMenuItems}>
-          <Typography>{props.label}</Typography>
+          <Typography>{props.node.label}</Typography>
         </ContextMenu>
       </Box>
     </Draggable>
