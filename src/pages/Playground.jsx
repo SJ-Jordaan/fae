@@ -170,7 +170,7 @@ export const Playground = (props) => {
     <ContextMenu contextMenuItems={contextMenuItems}>
       <Container sx={playgroundStyles}>
         <Xwrapper>
-          <TrackingBox />
+          {newTransition && <TrackingBox />}
           <Grid />
         </Xwrapper>
       </Container>
