@@ -66,7 +66,20 @@ export const Playground = (props) => {
 
   const deleteNode = (oldNode) => {
     const newNodes = nodes.filter((node) => node.label !== oldNode.label);
+
+    if (oldNode.isStarting && nodes.length !== 1) {
+      newNodes[0].isStarting = true;
+      const newTransitions = [...transitions];
+      newTransitions[0].end = newNodes[0].label;
+      setTransitions(newTransitions);
+    }
+
+    const newTransitions = transitions.filter(
+      (t) => t.start !== oldNode.label && t.end !== oldNode.label,
+    );
+
     setNodes(newNodes);
+    setTransitions(newTransitions);
   };
 
   const handleNodeClick = (node) => {
