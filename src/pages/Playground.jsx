@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
 
-import { Container } from '@mui/material';
+import { Container, Typography } from '@mui/material';
 import Xarrow, { Xwrapper } from 'react-xarrows';
 
-import { Node, ContextMenu, TrackingBox, TransitionModal } from '../components';
+import {
+  Node,
+  ContextMenu,
+  TrackingBox,
+  TransitionModal,
+  SideBar,
+  AutomatonModal,
+} from '../components';
 import { StorageProvider } from '../providers';
 import { CACHE_KEYS } from '../constants';
+import { generateDFA, parseAutomatonSchematic } from '../helpers/automaton';
+
+const drawerWidth = 240;
 
 const playgroundStyles = {
   height: '100%',
   width: '100%',
-  minWidth: '100vw',
+  minWidth: `calc(100vw - ${drawerWidth}px)`,
   boxSizing: 'border-box',
   padding: '24px',
 };
@@ -18,6 +28,7 @@ const playgroundStyles = {
 const arrowStyles = {
   color: 'black',
   strokeWidth: 2,
+  path: 'straight',
 };
 
 export const Playground = (props) => {
@@ -28,11 +39,58 @@ export const Playground = (props) => {
     StorageProvider.getItem(CACHE_KEYS.TRANSITIONS) || [],
   );
   const [newTransition, setNewTransition] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [showTransitionModal, setShowTransitionModal] = useState(false);
+  const [showAutomatonModal, setShowAutomatonModal] = useState(true);
+  const [automaton, setAutomaton] = useState(null);
 
-  const addFirstNode = (e) => {
+  const defineAutomaton = (
+    mode,
+    alphabet,
+    type,
+    nodeCount,
+    transitionCount,
+    finalCount = 1,
+  ) => {
+    const automatonDetails = {
+      mode,
+      alphabet,
+      type,
+      nodeCount,
+      transitionCount,
+      finalCount,
+    };
+
+    setAutomaton(automatonDetails);
+
+    if (mode === 1) {
+      generateAutomaton(automatonDetails);
+      setShowAutomatonModal(false);
+      return;
+    }
+
+    addFirstNode();
+    setShowAutomatonModal(false);
+  };
+
+  const generateAutomaton = (automatonDetails) => {
+    if (automatonDetails.type === 'DFA') {
+      const schematic = generateDFA(
+        automatonDetails.nodeCount,
+        automatonDetails.alphabet,
+        automatonDetails.finalCount,
+      );
+
+      const { nodes, transitions } = parseAutomatonSchematic(schematic);
+      setNodes(nodes);
+      setTransitions(transitions);
+
+      return;
+    }
+  };
+
+  const addFirstNode = () => {
     const newNode = {
-      label: 'S0',
+      label: `S0`,
       isStarting: true,
       isAccepting: false,
       position: { x: 0, y: 0 },
@@ -40,21 +98,37 @@ export const Playground = (props) => {
 
     const newTransition = {
       start: 'entryNode',
-      end: 'S0',
+      end: `S0`,
     };
 
     setNodes([newNode]);
     setTransitions([newTransition]);
   };
 
-  const addNode = (e) => {
+  const addNodeManually = (e) => {
     if (nodes.length === 0) {
-      addFirstNode(e);
+      addFirstNode();
       return;
     }
+    let searching = true;
+    let newLabel = 0;
+
+    do {
+      let i;
+      for (i = 0; i < nodes.length; i++) {
+        if (nodes[i].label === `S${newLabel}`) {
+          newLabel++;
+          break;
+        }
+      }
+
+      if (i === nodes.length) {
+        searching = false;
+      }
+    } while (searching);
 
     const newNode = {
-      label: `S${nodes.length}`,
+      label: `S${newLabel}`,
       isAccepting: false,
       position: { x: 0, y: 0 },
     };
@@ -95,6 +169,30 @@ export const Playground = (props) => {
   const updateTransition = (oldTransition, newTransition) => {
     const originalTransitions = transitions.filter((t) => t !== oldTransition);
 
+    let duplicate = false;
+    const updatedTransitions = originalTransitions.flatMap((t) => {
+      if (t.start === newTransition.start && t.end === newTransition.end) {
+        duplicate = true;
+
+        return {
+          ...t,
+          value: [t.value, newTransition.value],
+          labels: (
+            <Typography
+              bgcolor={'white'}
+            >{`${t.value},${newTransition.value}`}</Typography>
+          ),
+        };
+      }
+
+      return t;
+    });
+
+    if (duplicate) {
+      setTransitions(updatedTransitions);
+      return;
+    }
+
     setTransitions([...originalTransitions, newTransition]);
   };
 
@@ -111,7 +209,7 @@ export const Playground = (props) => {
     updatedTransition.end = node.label;
 
     setNewTransition(null);
-    setShowModal(true);
+    setShowTransitionModal(true);
     setTransitions([...originalTransitions, updatedTransition]);
   };
 
@@ -119,7 +217,7 @@ export const Playground = (props) => {
     const tempTransition = {
       start: node.label,
       end: 'mouseTracker',
-      value: 0,
+      value: [0],
     };
 
     setNewTransition(tempTransition);
@@ -165,13 +263,42 @@ export const Playground = (props) => {
       );
     });
 
-    const transitionGrid = transitions.map((transition, index) => (
-      <Xarrow
-        key={`${transition.start}-${transition.end}-${index}`}
-        {...transition}
-        {...arrowStyles}
-      />
-    ));
+    const transitionGrid = transitions.map((transition, index) => {
+      if (transition.start === transition.end) {
+        return (
+          <>
+            <Xarrow
+              key={`${transition.start}-self-${index}`}
+              start={`self-${transition.start}`}
+              end={transition.end}
+              curveness={0}
+              endAnchor='top'
+              startAnchor='top'
+              {...arrowStyles}
+            />
+            <Xarrow
+              key={`${transition.start}-${transition.end}-${index}`}
+              start={transition.start}
+              labels={transition.labels}
+              curveness={0.3}
+              end={`self-${transition.end}`}
+              startAnchor='right'
+              showHead={false}
+              endAnchor='top'
+              {...arrowStyles}
+            />
+          </>
+        );
+      }
+
+      return (
+        <Xarrow
+          key={`${transition.start}-${transition.end}-${index}`}
+          {...transition}
+          {...arrowStyles}
+        />
+      );
+    });
 
     return [...nodeGrid, ...transitionGrid];
   };
@@ -189,7 +316,7 @@ export const Playground = (props) => {
   const contextMenuItems = [
     {
       text: 'Add State',
-      handleClick: (e) => addNode(e),
+      handleClick: (e) => addNodeManually(e),
     },
     {
       text: 'Save Progress',
@@ -202,27 +329,39 @@ export const Playground = (props) => {
   ];
 
   return (
-    <ContextMenu contextMenuItems={contextMenuItems}>
-      <Container sx={playgroundStyles}>
-        <Xwrapper>
-          {newTransition && <TrackingBox />}
-          <Grid />
-          <TransitionModal
-            showModal={showModal}
-            transition={transitions[transitions.length - 1]}
-            onSubmit={(oldT, newT) => {
-              updateTransition(oldT, newT);
-              setShowModal(false);
-              setNewTransition(null);
-            }}
-            onClose={(t) => {
-              setShowModal(false);
-              deleteTransition(t);
-              setNewTransition(null);
-            }}
-          />
-        </Xwrapper>
-      </Container>
-    </ContextMenu>
+    <SideBar
+      drawerWidth={drawerWidth}
+      title={'Finite Automata Editor'}
+      alphabet={automaton?.alphabet?.join(',')}
+      type={automaton?.type}
+    >
+      <ContextMenu contextMenuItems={contextMenuItems}>
+        <Container sx={playgroundStyles}>
+          <Xwrapper>
+            {newTransition && <TrackingBox />}
+            <Grid />
+          </Xwrapper>
+        </Container>
+      </ContextMenu>
+      <TransitionModal
+        showModal={showTransitionModal}
+        alphabet={automaton?.alphabet}
+        transition={transitions[transitions.length - 1]}
+        onSubmit={(oldT, newT) => {
+          updateTransition(oldT, newT);
+          setShowTransitionModal(false);
+          setNewTransition(null);
+        }}
+        onClose={(t) => {
+          setShowTransitionModal(false);
+          deleteTransition(t);
+          setNewTransition(null);
+        }}
+      />
+      <AutomatonModal
+        showModal={showAutomatonModal}
+        onSubmit={defineAutomaton}
+      />
+    </SideBar>
   );
 };

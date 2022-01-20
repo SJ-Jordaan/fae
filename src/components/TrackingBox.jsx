@@ -14,7 +14,7 @@ export const TrackingBox = () => {
   }, []);
 
   const boxStyles = {
-    transform: `translate3d(${mouse.x - 18}px, ${mouse.y - 18}px, 0)`,
+    transform: `translate3d(${mouse.x - 24}px, ${mouse.y - 80}px, 0)`,
   };
 
   return <Box id='mouseTracker' ref={mainCursor} sx={boxStyles} />;

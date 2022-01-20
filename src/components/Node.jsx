@@ -26,6 +26,7 @@ const acceptingNodeStyles = {
 
 const entryNodeStyles = {
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'center',
   boxSizing: 'border-box',
   width: '100px',
@@ -35,6 +36,10 @@ const entryNodeStyles = {
 const invisibleNodeStyles = {
   display: 'flex',
   margin: '0 24px 0 0',
+};
+
+const selfNode = {
+  margin: '0 0 48px 48px',
 };
 
 export const Node = (props) => {
@@ -68,18 +73,28 @@ export const Node = (props) => {
     >
       {props.node.isStarting ? (
         <Box ref={nodeRef} sx={entryNodeStyles}>
-          <Box sx={invisibleNodeStyles} id={'entryNode'} />
           <Box
-            sx={
-              props.node.isAccepting
-                ? { ...regularNodeStyles, ...acceptingNodeStyles }
-                : regularNodeStyles
-            }
-            id={props.node.label}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              padding: '0 0 48px',
+            }}
           >
-            <ContextMenu contextMenuItems={props.contextMenuItems}>
-              <Typography>{props.node.label}</Typography>
-            </ContextMenu>
+            <Box sx={selfNode} id={`self-${props.node?.label}`} />
+            <Box sx={invisibleNodeStyles} id={'entryNode'} />
+            <Box
+              sx={
+                props.node.isAccepting
+                  ? { ...regularNodeStyles, ...acceptingNodeStyles }
+                  : regularNodeStyles
+              }
+              id={props.node.label}
+            >
+              <ContextMenu contextMenuItems={props.contextMenuItems}>
+                <Typography>{props.node.label}</Typography>
+              </ContextMenu>
+            </Box>
           </Box>
         </Box>
       ) : (
@@ -92,9 +107,19 @@ export const Node = (props) => {
               : regularNodeStyles
           }
         >
-          <ContextMenu contextMenuItems={props.contextMenuItems}>
-            <Typography>{props.node.label}</Typography>
-          </ContextMenu>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              padding: '0 0 48px',
+            }}
+          >
+            <Box sx={selfNode} id={`self-${props.node?.label}`} />
+            <ContextMenu contextMenuItems={props.contextMenuItems}>
+              <Typography>{props.node.label}</Typography>
+            </ContextMenu>
+          </Box>
         </Box>
       )}
     </Draggable>

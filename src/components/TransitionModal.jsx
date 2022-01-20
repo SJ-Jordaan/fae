@@ -7,22 +7,23 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Backdrop, Typography } from '@mui/material';
+import { MultipleSelect } from '.';
 
 export const TransitionModal = (props) => {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState([]);
 
   const handleSubmit = () => {
     props.onSubmit?.(props.transition, {
       ...props.transition,
       value: input,
-      labels: <Typography bgcolor={'white'}>{input}</Typography>,
+      labels: <Typography bgcolor={'white'}>{input?.join(',')}</Typography>,
     });
-    setInput('');
+    setInput([]);
   };
 
   const handleClose = () => {
     props.onClose?.(props.transition);
-    setInput('');
+    setInput([]);
   };
 
   return (
@@ -34,16 +35,9 @@ export const TransitionModal = (props) => {
             Enter the value for the transition from {props.transition?.start} to{' '}
             {props.transition?.end}.
           </DialogContentText>
-          <TextField
-            autoFocus
-            margin='dense'
-            id='transition'
-            label='Transition value'
-            type='text'
-            value={input}
-            onInput={(e) => setInput(e.target.value)}
-            fullWidth
-            variant='standard'
+          <MultipleSelect
+            values={props.alphabet}
+            onChange={(values) => setInput(values)}
           />
         </DialogContent>
         <DialogActions>
