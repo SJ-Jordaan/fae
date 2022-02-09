@@ -15,6 +15,7 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import AbcIcon from '@mui/icons-material/Abc';
 import LensIcon from '@mui/icons-material/Lens';
+import { ListItemButton } from '@mui/material';
 
 export const SideBar = (props) => {
   return (
@@ -63,9 +64,9 @@ export const SideBar = (props) => {
             <ListItemText primary={props.alphabet} />
           </ListItem>
           <ListItem key={'Type'}>
-            <ListItemIcon>
-              <LensIcon />
-            </ListItemIcon>
+            <ListItemButton onClick={props.handlePrettify}>
+              Prettify
+            </ListItemButton>
             <ListItemText primary={props.type} />
           </ListItem>
         </List>

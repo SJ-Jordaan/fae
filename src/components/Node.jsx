@@ -6,32 +6,11 @@ import Draggable from 'react-draggable';
 import { useXarrow } from 'react-xarrows';
 
 import { ContextMenu } from './ContextMenu';
-
-const regularNodeStyles = {
-  display: 'flex',
-  borderRadius: '50%',
-  borderColor: 'grey.500',
-  border: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '3em',
-  boxSizing: 'border-box',
-  height: '3em',
-  backgroundColor: 'white',
-};
-
-const acceptingNodeStyles = {
-  border: '4px double black',
-};
-
-const entryNodeStyles = {
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  boxSizing: 'border-box',
-  width: '100px',
-  alignItems: 'center',
-};
+import {
+  entryNodeStyles,
+  acceptingNodeStyles,
+  regularNodeStyles,
+} from '../constants';
 
 const invisibleNodeStyles = {
   display: 'flex',

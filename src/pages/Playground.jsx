@@ -14,6 +14,7 @@ import {
 import { StorageProvider } from '../providers';
 import { CACHE_KEYS } from '../constants';
 import { generateDFA, parseAutomatonSchematic } from '../helpers/automaton';
+import { GraphVisualisation } from './Graphviz';
 
 const drawerWidth = 240;
 
@@ -40,8 +41,11 @@ export const Playground = (props) => {
   );
   const [newTransition, setNewTransition] = useState(null);
   const [showTransitionModal, setShowTransitionModal] = useState(false);
-  const [showAutomatonModal, setShowAutomatonModal] = useState(true);
   const [automaton, setAutomaton] = useState(null);
+  const [showAutomatonModal, setShowAutomatonModal] = useState(
+    automaton === null,
+  );
+  const [prettify, setPrettify] = useState(false);
 
   const defineAutomaton = (
     mode,
@@ -334,34 +338,41 @@ export const Playground = (props) => {
       title={'Finite Automata Editor'}
       alphabet={automaton?.alphabet?.join(',')}
       type={automaton?.type}
+      handlePrettify={() => setPrettify(!prettify)}
     >
-      <ContextMenu contextMenuItems={contextMenuItems}>
-        <Container sx={playgroundStyles}>
-          <Xwrapper>
-            {newTransition && <TrackingBox />}
-            <Grid />
-          </Xwrapper>
-        </Container>
-      </ContextMenu>
-      <TransitionModal
-        showModal={showTransitionModal}
-        alphabet={automaton?.alphabet}
-        transition={transitions[transitions.length - 1]}
-        onSubmit={(oldT, newT) => {
-          updateTransition(oldT, newT);
-          setShowTransitionModal(false);
-          setNewTransition(null);
-        }}
-        onClose={(t) => {
-          setShowTransitionModal(false);
-          deleteTransition(t);
-          setNewTransition(null);
-        }}
-      />
-      <AutomatonModal
-        showModal={showAutomatonModal}
-        onSubmit={defineAutomaton}
-      />
+      {prettify ? (
+        <GraphVisualisation nodes={nodes} transitions={transitions} />
+      ) : (
+        <>
+          <ContextMenu contextMenuItems={contextMenuItems}>
+            <Container sx={playgroundStyles}>
+              <Xwrapper>
+                {newTransition && <TrackingBox />}
+                <Grid />
+              </Xwrapper>
+            </Container>
+          </ContextMenu>
+          <TransitionModal
+            showModal={showTransitionModal}
+            alphabet={automaton?.alphabet}
+            transition={transitions[transitions.length - 1]}
+            onSubmit={(oldT, newT) => {
+              updateTransition(oldT, newT);
+              setShowTransitionModal(false);
+              setNewTransition(null);
+            }}
+            onClose={(t) => {
+              setShowTransitionModal(false);
+              deleteTransition(t);
+              setNewTransition(null);
+            }}
+          />
+          <AutomatonModal
+            showModal={showAutomatonModal}
+            onSubmit={defineAutomaton}
+          />
+        </>
+      )}
     </SideBar>
   );
 };

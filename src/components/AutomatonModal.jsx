@@ -84,7 +84,7 @@ export const AutomatonModal = (props) => {
               label='Number of states'
               type='number'
               value={nodeCount}
-              onInput={(e) => setNodeCount(e.target.value)}
+              onInput={(e) => setNodeCount(parseInt(e.target.value))}
               variant='standard'
             />
             <TextField
