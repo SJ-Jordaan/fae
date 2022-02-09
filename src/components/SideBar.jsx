@@ -11,10 +11,7 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import AbcIcon from '@mui/icons-material/Abc';
-import LensIcon from '@mui/icons-material/Lens';
 import { ListItemButton } from '@mui/material';
 
 export const SideBar = (props) => {

@@ -32,6 +32,7 @@ export const generateDFA = (nodeCount = 1, alphabet = [], finalCount = 1) => {
     const transitionSymbol = alphabet[randomSymbolIndex];
     // Retrieve the state and update its transition
     const currentStateIndex = schematic.findIndex(
+      // eslint-disable-next-line
       (s) => s.label === currentNode,
     );
     schematic[currentStateIndex][transitionSymbol] = endState;
